@@ -4,22 +4,12 @@ conn = sqlite3.connect('restaurant.db')
 c = conn.cursor()
 
 
-"""-----------------------------------------------------------------------------------------"""
-
-
-class Customer:
-    pass
-
-
-"""-----------------------------------------------------------------------------------------"""
-
-
 class Order:
     id = 0
 
-    def __init__(self, hour=None, food=None, phone=None):
+    def __init__(self, hour=None, phone=None):
         self.hour = hour
-        self.food = food
+        self.food = {}
         self.phone = phone
         self.id = Order.id
         Order.id += 1
@@ -47,15 +37,24 @@ def pick_order():
     order.phone = input("Great! Please enter phone number: ")
     order.hour = input("What is estimated time of your arrival?: ")
 
+
     dynamic_data_entry(order.id, tag, amount, order.hour, order.phone)
 
-    test = input("To make another order type Y (Yes): ")
-    if test == "Y":
-        pick_order()
-    else:
-        print("See you at {}".format(order.hour))
-        c.close()
-        conn.close()
+    def testing():
+        test = input("Type O to order another burger\nType N if you are new customer\nPress Enter to finish: ")
+        if test == "N":
+            pick_order()
+        elif test == "O":
+            tag = int(input("Please input burger id: "))
+            amount = input("Give the amount: ")
+            dynamic_data_entry(order.id, tag, amount, order.hour, order.phone)
+            testing()
+        else:
+            print("-"*40, "See you at {}".format(order.hour), sep="\n")
+            c.close()
+            conn.close()
+
+    testing()
 
 
 pick_order()
