@@ -34,15 +34,15 @@ def dynamic_data_entry(id, name, tag, price):
 	conn.commit()
 
 # burgers data build-up
-# dynamic_data_entry(1,'Classic','CL',20.00)
-# dynamic_data_entry(2,'Bacon','B',23.00)
-# dynamic_data_entry(3,'Cheese','CH',22.00)
-# dynamic_data_entry(4,'BBQ','BBQ',24.00)
-# dynamic_data_entry(5,'HOT','HOT',24.00)
-# dynamic_data_entry(6,'Cheese&Bacon','CHB',25.00)
-# dynamic_data_entry(7,'Koza','K',25.00)
-# dynamic_data_entry(8,'Boski Wloski','BW',27.00)
-# dynamic_data_entry(9,'Gruba Bula','GB',29.00)
+dynamic_data_entry(1,'Classic','CL',20.00)
+dynamic_data_entry(2,'Bacon','B',23.00)
+dynamic_data_entry(3,'Cheese','CH',22.00)
+dynamic_data_entry(4,'BBQ','BBQ',24.00)
+dynamic_data_entry(5,'HOT','HOT',24.00)
+dynamic_data_entry(6,'Cheese&Bacon','CHB',25.00)
+dynamic_data_entry(7,'Koza','K',25.00)
+dynamic_data_entry(8,'Boski Wloski','BW',27.00)
+dynamic_data_entry(9,'Gruba Bula','GB',29.00)
 
 
 c.close()

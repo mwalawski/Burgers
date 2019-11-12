@@ -26,9 +26,14 @@ def dynamic_data_entry(id, product, amount, hour, phone):
     conn.commit()
 
 def check_availabilty(order_amount, burger_limit=8):
-    opoo = (time.ctime(time.time())[11:16])
-    c.execute('SELECT hour FROM orders WHERE hour<? GROUP BY hour HAVING SUM(amount+?)<=?',(opoo, order_amount, burger_limit))
+    current_time = (time.ctime(time.time())[11:16])
+    c.execute('SELECT hour FROM orders WHERE hour<? GROUP BY hour HAVING SUM(amount+?)<=?',(current_time, order_amount, burger_limit))
     return [hour[0] for hour in c.fetchall()]
+
+def checkout():
+    order_id=input('Enter your order ID: ')
+    c.execute('SELECT SUM(p.price*o.amount) FROM products p, orders o WHERE o.ID=? AND o.product=p.ID',(order_id))
+    return c.fetchall()[0][0]
 
 
 def pick_order():
@@ -44,15 +49,16 @@ def pick_order():
     print("Right now we can prepare your burgers at: ")
     for count, value in enumerate(check_availabilty(amount), start=1):
         print(count, '-', value)
-    chosen_hour=int(input("Choose prefered hour by typing its number"))-1
 
-    order.phone = input("Great! Please enter phone number: ")
+    chosen_hour=int(input("Choose preferred hour by typing its number "))-1
+    order.phone = input("Please enter phone number: ")
     order.hour = check_availabilty(amount)[chosen_hour]
 
 
     dynamic_data_entry(order.id, tag, amount, order.hour, order.phone)
 
-    def testing():
+
+    def service():
         test = input("Type O to order another burger\nType N if you are new customer\nPress Enter to finish: ")
         if test == "N":
             pick_order()
@@ -66,10 +72,10 @@ def pick_order():
             c.close()
             conn.close()
 
-    testing()
+#     service()
+#
+#
+# pick_order()
 
-
-pick_order()
-
-
+print(checkout())
 """"----------------------------------------------------------------"""
