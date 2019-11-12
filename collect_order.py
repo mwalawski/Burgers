@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 conn = sqlite3.connect('restaurant.db')
 c = conn.cursor()
@@ -16,13 +17,18 @@ class Order:
 
 
 def create_table():
-    c.execute('CREATE TABLE IF NOT EXISTS orders(ID REAL, product REAL, amount REAL, hour TEXT, phone TEXT)')
+    c.execute('CREATE TABLE IF NOT EXISTS orders(ID REAL, product REAL, amount REAL, hour REAL, phone TEXT)')
 
 
 def dynamic_data_entry(id, product, amount, hour, phone):
     create_table()
     c.execute("INSERT INTO orders(ID, product, amount, hour, phone) VALUES (?,?,?,?,?)", (id, product, amount, hour, phone))
     conn.commit()
+
+def check_availabilty(order_amount, burger_limit=8):
+    opoo = (time.ctime(time.time())[11:16])
+    c.execute('SELECT hour FROM orders WHERE hour<? GROUP BY hour HAVING SUM(amount+?)<=?',(opoo, order_amount, burger_limit))
+    return [hour[0] for hour in c.fetchall()]
 
 
 def pick_order():
@@ -34,8 +40,14 @@ def pick_order():
     print("1 - Classic", "3 - Cheeseburger", "6 - Cheese&Bacon", "2 - Bacon", "4 - BBQ\n", sep='\n')
     tag = int(input("Please input burger id: "))
     amount = input("Give the amount: ")
+
+    print("Right now we can prepare your burgers at: ")
+    for count, value in enumerate(check_availabilty(amount), start=1):
+        print(count, '-', value)
+    chosen_hour=int(input("Choose prefered hour by typing its number"))-1
+
     order.phone = input("Great! Please enter phone number: ")
-    order.hour = input("What is estimated time of your arrival?: ")
+    order.hour = check_availabilty(amount)[chosen_hour]
 
 
     dynamic_data_entry(order.id, tag, amount, order.hour, order.phone)
@@ -58,3 +70,6 @@ def pick_order():
 
 
 pick_order()
+
+
+""""----------------------------------------------------------------"""
