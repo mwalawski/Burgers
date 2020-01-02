@@ -3,9 +3,6 @@ import tkinter.ttk as ttk
 import sqlite3
 from operations import *
 
-conn = sqlite3.connect('testing3.db')
-c = conn.cursor()
-
 
 class StyledLabel(tk.Label):
 	def __init__(self, *args, **kwargs):
@@ -37,12 +34,12 @@ class Interface(Operations):
 	def create_data_bar(self):
 		data_bar_frame = tk.Frame(self.root, bg='#2b3138')
 		data_bar_frame.grid(row=10, column=0, columnspan=7, padx=5, pady=5, sticky='nesw')
-		order_id_label = StyledLabel(data_bar_frame, text="Order Number:")
+		order_id_label = StyledLabel(data_bar_frame, text='Order Number:')
 		order_id_label.grid(row=0, column=0, sticky='e', padx=20)
 		self.order_id_entry = tk.Entry(data_bar_frame, state='disabled', disabledbackground='white',
 									   disabledforeground='black')
 		self.order_id_entry.grid(row=0, column=1, padx=20, pady=16, sticky='e')
-		customer_phone_label = StyledLabel(data_bar_frame, text="Phone Number:")
+		customer_phone_label = StyledLabel(data_bar_frame, text='Phone Number:')
 		customer_phone_label.grid(row=1, column=0, padx=20, sticky='e')
 		self.customer_phone_entry = tk.Entry(data_bar_frame)
 		self.customer_phone_entry.grid(row=1, column=1, padx=20, pady=16, sticky='e')
@@ -62,14 +59,14 @@ class Interface(Operations):
 		button_frame = tk.Frame(data_bar_frame, bg='#2b3138')
 		button_frame.grid(row=3, column=0, columnspan=3)
 
-		next_button = tk.Button(button_frame, text="Add New", command=lambda: self.add_order_to_database())
+		next_button = tk.Button(button_frame, text='Add New', command=lambda: self.add_order_to_database())
 		next_button.grid(row=3, column=0, padx=8, pady=25)
-		summary_button = tk.Button(button_frame, text="Update Order", command=lambda: self.update_order_to_database())
+		summary_button = tk.Button(button_frame, text='Update Order', command=lambda: self.update_order_to_database())
 		summary_button.grid(row=3, column=1, padx=8, pady=25)
 
-		clear_button = tk.Button(button_frame, text="Clear All", command=lambda: self.clear_all())
+		clear_button = tk.Button(button_frame, text='Clear All', command=lambda: self.clear_all())
 		clear_button.grid(row=3, column=2, padx=8, pady=25)
-		delete_button = tk.Button(button_frame, text="Delete Order", command=lambda: self.delete_order())
+		delete_button = tk.Button(button_frame, text='Delete Order', command=lambda: self.delete_order())
 		delete_button.grid(row=3, column=3, padx=8, pady=25)
 
 	def create_order_bar(self):

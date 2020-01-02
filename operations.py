@@ -2,7 +2,7 @@ import sqlite3
 import time
 from tkinter import messagebox
 
-conn = sqlite3.connect('testing3.db')
+conn = sqlite3.connect('orders.db')
 c = conn.cursor()
 
 
@@ -15,7 +15,7 @@ class Operations():
 				c.execute('SELECT name FROM products WHERE  product_id=?', (spinbox[0],))
 				text += "{:7}: {}\n".format(c.fetchall()[0][0], int(spinbox[1].get()))
 			order_amount += int(spinbox[1].get())
-		self.order_summary_list.delete("1.0", 'end')
+		self.order_summary_list.delete('1.0', 'end')
 		self.order_summary_list.insert('end', text)
 		if order_amount != 0:
 			self.check_availability(order_amount)
@@ -39,7 +39,7 @@ class Operations():
 		if self.order_hour_combobox.get() != '' and self.order_hour_combobox.get()[0] != '*':
 			return True
 		else:
-			self.order_hour_combobox.delete("0", 'end')
+			self.order_hour_combobox.delete('0', 'end')
 			self.order_hour_combobox.config(state='normal')
 			self.order_hour_combobox.insert('end', '*SET HOUR*')
 			self.order_hour_combobox.config(state='readonly')
@@ -85,7 +85,7 @@ class Operations():
 			confirm_delete = messagebox.askyesno("Warning", "Do you want to delete Order #{} ?".format(
 				self.order_id_entry.get()))
 			if confirm_delete == True:
-				c.execute("PRAGMA foreign_keys=ON")
+				c.execute('PRAGMA foreign_keys=ON')
 				c.execute('DELETE FROM orders WHERE order_id=?', (int(self.order_id_entry.get()),))
 				conn.commit()
 				self.clear_all()
@@ -150,7 +150,7 @@ class Operations():
 	def generate_order_id(self):
 		if self.order_id_entry.get() == '':
 			self.order_id_entry.config(state='normal')
-			c.execute('SELECT MAX(order_id)+1 FROM orders')
+			c.execute('SELECT IFNULL(MAX(order_id)+1,1) FROM orders')
 			self.order_id_entry.insert('end', c.fetchall()[0][0])
 			self.order_id_entry.config(state='disabled')
 
