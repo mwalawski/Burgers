@@ -1,34 +1,33 @@
-import sqlite3
 import time
 from tkinter import messagebox
-
-conn = sqlite3.connect('orders.db')
-c = conn.cursor()
+from database import Database
 
 
-class Operations():
+class Operations(Database):
+	def __init__(self):
+		Database.__init__(self)
+
 	def update_summary_list(self, event=None):
-		text = ''
-		order_amount = 0
+		ordered_products = ''
+		ordered_amount = 0
 		for spinbox in self.entries:
 			if spinbox[1].get() != '0' and spinbox[1].get() != '':
-				c.execute('SELECT name FROM products WHERE  product_id=?', (spinbox[0],))
-				text += "{:7}: {}\n".format(c.fetchall()[0][0], int(spinbox[1].get()))
-			order_amount += int(spinbox[1].get())
+				self.c.execute('SELECT name FROM products WHERE  product_id=?', (spinbox[0],))
+				ordered_products += "{:7}: {}\n".format(self.c.fetchall()[0][0], int(spinbox[1].get()))
+			ordered_amount += int(spinbox[1].get())
 		self.order_summary_list.delete('1.0', 'end')
-		self.order_summary_list.insert('end', text)
-		if order_amount != 0:
-			self.check_availability(order_amount)
+		self.order_summary_list.insert('end', ordered_products)
+		if ordered_amount != 0:
+			self.check_availability(ordered_amount)
 
 	def checkout(self, order_id):
-		c.execute('''SELECT SUM(p.price*q.amount) 
+		self.c.execute('''SELECT SUM(p.price*q.amount) 
 					FROM products p, quantity q
 					WHERE q.product_id=p.product_id AND q.order_id=?''',
 					(int(order_id),)
 					)
-		checkout_text = "\n" * 3 + "-" * 38 + "\n" + "Price:  " + str(c.fetchall()[0][0]) + " PLN"
+		checkout_text = "\n" * 3 + "-" * 38 + "\n" + "Price:  " + str(self.c.fetchall()[0][0]) + " PLN"
 		self.order_summary_list.insert('end', checkout_text)
-		conn.commit()
 
 	def check_not_empty_spinbox(self):
 		for spinbox in self.entries:
@@ -47,56 +46,59 @@ class Operations():
 	def add_order_to_database(self):
 		self.generate_order_id()
 		if self.check_not_empty_hour() == 1 and self.check_not_empty_spinbox() == 1:
-			c.execute('INSERT INTO orders (order_id, hour, phone) VALUES (?, ?, NULLIF(?,""))',
+			self.c.execute('INSERT INTO orders (order_id, hour, phone) VALUES (?, ?, NULLIF(?,""))',
 					  (int(self.order_id_entry.get()),
-					   self.order_hour_combobox.get()[0:5],
-					   self.customer_phone_entry.get())
+					  self.order_hour_combobox.get()[0:5],
+					  self.customer_phone_entry.get())
 					  )
 			for spinbox in self.entries:
 				if spinbox[1].get() != '0' and spinbox[1].get() != '':
-					c.execute('INSERT INTO quantity (product_id, amount, order_id) VALUES (?,?,?)',
+					self.c.execute('INSERT INTO quantity (product_id, amount, order_id) VALUES (?,?,?)',
 							  (spinbox[0],
 							   spinbox[1].get(),
 							   int(self.order_id_entry.get()))
 							  )
 
 			self.checkout(self.order_id_entry.get())
+		self.conn.commit()
 
 	def update_order_to_database(self):
 		if self.check_not_empty_hour() == 1 and self.check_not_empty_spinbox() == 1:
-			c.execute('UPDATE orders SET hour=?, phone=NULLIF(?,"") WHERE order_id=?',
+			self.c.execute('UPDATE orders SET hour=?, phone=NULLIF(?,"") WHERE order_id=?',
 					  (self.order_hour_combobox.get()[0:5],
 					   self.customer_phone_entry.get(),
 					   int(self.order_id_entry.get()))
 					  )
-			c.execute('DELETE FROM quantity WHERE order_id=?', (int(self.order_id_entry.get()),))
+			self.c.execute('DELETE FROM quantity WHERE order_id=?', (int(self.order_id_entry.get()),))
 
 			for spinbox in self.entries:
 				if spinbox[1].get() != '0' and spinbox[1].get() != '':
-					c.execute('INSERT INTO quantity (product_id, amount, order_id) VALUES (?,?,?)',
+					self.c.execute('INSERT INTO quantity (product_id, amount, order_id) VALUES (?,?,?)',
 							  (spinbox[0],
 							   spinbox[1].get(),
 							   int(self.order_id_entry.get()))
 							  )
 			self.checkout(self.order_id_entry.get())
+		self.conn.commit()
 
 	def delete_order(self):
 		if self.order_id_entry.get() != '':
 			confirm_delete = messagebox.askyesno("Warning", "Do you want to delete Order #{} ?".format(
 				self.order_id_entry.get()))
 			if confirm_delete == True:
-				c.execute('PRAGMA foreign_keys=ON')
-				c.execute('DELETE FROM orders WHERE order_id=?', (int(self.order_id_entry.get()),))
-				conn.commit()
+				self.c.execute('PRAGMA foreign_keys=ON')
+				self.c.execute('DELETE FROM orders WHERE order_id=?', (int(self.order_id_entry.get()),))
+				self.conn.commit()
 				self.clear_all()
 			else:
 				pass
+		self.conn.commit()
 
 	def set_order_box(self, event=None):
 		self.order_box.delete(0, 'end')
 		hour = self.filter_order_hour_combo.get() + ':' + self.filter_order_minute_combo.get()
-		c.execute('SELECT order_id FROM orders WHERE hour=?', (hour,))
-		orders = c.fetchall()
+		self.c.execute('SELECT order_id FROM orders WHERE hour=?', (hour,))
+		orders = self.c.fetchall()
 		if len(orders) != 0:
 			for item in orders:
 				self.order_box.insert('end', "ORDER  #{}".format(item[0]))
@@ -116,8 +118,8 @@ class Operations():
 			for spinbox in self.entries:
 				spinbox[1].delete("0", 'end')
 				spinbox[1].insert('end', "0")
-			c.execute('SELECT phone, hour FROM orders WHERE order_id=?', (selected_id,))
-			(phone, hour) = c.fetchall()[0]
+			self.c.execute('SELECT phone, hour FROM orders WHERE order_id=?', (selected_id,))
+			(phone, hour) = self.c.fetchall()[0]
 			self.customer_phone_entry.delete("0", 'end')
 
 			if phone != None:
@@ -126,9 +128,9 @@ class Operations():
 			self.order_hour_combobox.delete("0", 'end')
 			self.order_hour_combobox.insert('end', hour)
 			self.order_hour_combobox.config(state='readonly')
-			c.execute('SELECT product_id, amount FROM quantity q WHERE order_id=?', (selected_id,))
+			self.c.execute('SELECT product_id, amount FROM quantity q WHERE order_id=?', (selected_id,))
 
-			for product_id, amount in c.fetchall():
+			for product_id, amount in self.c.fetchall():
 				for spinbox in self.entries:
 					if spinbox[0] == product_id:
 						spinbox[1].delete("0", 'end')
@@ -150,8 +152,8 @@ class Operations():
 	def generate_order_id(self):
 		if self.order_id_entry.get() == '':
 			self.order_id_entry.config(state='normal')
-			c.execute('SELECT IFNULL(MAX(order_id)+1,1) FROM orders')
-			self.order_id_entry.insert('end', c.fetchall()[0][0])
+			self.c.execute('SELECT IFNULL(MAX(order_id)+1,1) FROM orders')
+			self.order_id_entry.insert('end', self.c.fetchall()[0][0])
 			self.order_id_entry.config(state='disabled')
 
 	def check_availability(self, order_amount, limit=10):
@@ -164,14 +166,14 @@ class Operations():
 			if slot < current_time:
 				all_hour_slots.remove(slot)
 
-		c.execute('''SELECT o.hour, SUM(q.amount)
+		self.c.execute('''SELECT o.hour, SUM(q.amount)
 					FROM orders o, quantity q 
 					WHERE q.order_id=o.order_id AND o.hour>=?
 					GROUP BY o.hour''',
 				  (current_time,))
 
 		available_hour_slots = []
-		for stored_slot, stored_amount in c.fetchall():
+		for stored_slot, stored_amount in self.c.fetchall():
 			if stored_slot in all_hour_slots[:]:
 				all_hour_slots.remove(stored_slot)
 				if stored_amount + order_amount <= limit:
