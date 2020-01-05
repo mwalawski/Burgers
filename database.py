@@ -1,20 +1,29 @@
+from os import path
 import sqlite3
 
 
 class Database:
 	def __init__(self):
+		if not path.exists('orders.db'):
+			self.connect_db()
+			self.menu_entry(1, 'Classic', 'CL', 20.00)
+			self.menu_entry(2, 'Bacon', 'B', 23.00)
+			self.menu_entry(3, 'Cheese', 'CH', 22.00)
+			self.menu_entry(4, 'BBQ', 'BBQ', 24.00)
+			self.menu_entry(5, 'Hot', 'HOT', 24.00)
+			self.menu_entry(6, 'Smokey', 'S', 25.00)
+			self.menu_entry(7, 'Goaty', 'G', 25.00)
+			self.menu_entry(8, 'Italian', 'IT', 27.00)
+			self.menu_entry(9, 'DoubleM', 'DM', 29.00)
+		else:
+			self.connect_db()
+
+		self.conn.commit()
+
+	def connect_db(self):
 		self.conn = sqlite3.connect('orders.db')
 		self.c = self.conn.cursor()
 		self.create_table()
-		self.menu_entry(1, 'Classic', 'CL', 20.00)
-		self.menu_entry(2, 'Bacon', 'B', 23.00)
-		self.menu_entry(3, 'Cheese', 'CH', 22.00)
-		self.menu_entry(4, 'BBQ', 'BBQ', 24.00)
-		self.menu_entry(5, 'Hot', 'HOT', 24.00)
-		self.menu_entry(6, 'Smokey', 'S', 25.00)
-		self.menu_entry(7, 'Goaty', 'G', 25.00)
-		self.menu_entry(8, 'Italian', 'IT', 27.00)
-		self.menu_entry(9, 'DoubleM', 'DM', 29.00)
 
 	def create_table(self):
 		self.c.execute("PRAGMA foreign_keys=ON")
