@@ -6,7 +6,6 @@ Restaurant order management system created in Python
 * [Technologies](#technologies)
 * [Layout](#layout)
 * [User Manual](#user-manual)
-* [Setup](#setup)
 
 ## General info
 This project is a simple application for collecting orders from customers. Digging into Tkinter, SQLite with creating a complexed set of features in Python was the main motivation to undertake this task.
@@ -57,12 +56,3 @@ To filter stored orders single out receipt time from drop-down list.
 <br>Then, select order number to view details of the particular order.
 <br>
 <br>![view order](/images/search.jpg)
-
-## Setup
-To run this project, install it locally using npm:
-
-```
-$ cd ../lorem
-$ npm install
-$ npm start
-```
