@@ -39,18 +39,18 @@ class Interface(Operations):
 
 		order_id_label = StyledLabel(data_bar_frame, text='Order Number:')
 		order_id_label.grid(row=0, column=0, sticky='e', padx=20)
-		self.order_id_entry = tk.Entry(data_bar_frame, state='disabled', disabledbackground='white',
+		self.order_id_entry = tk.Entry(data_bar_frame, width=23, state='disabled', disabledbackground='white',
 									   disabledforeground='black')
 		self.order_id_entry.grid(row=0, column=1, padx=20, pady=16, sticky='e')
 
 		customer_phone_label = StyledLabel(data_bar_frame, text='Phone Number:')
 		customer_phone_label.grid(row=1, column=0, padx=20, sticky='e')
-		self.customer_phone_entry = tk.Entry(data_bar_frame)
+		self.customer_phone_entry = tk.Entry(data_bar_frame, width=23)
 		self.customer_phone_entry.grid(row=1, column=1, padx=20, pady=16, sticky='e')
 
 		order_hour_label = StyledLabel(data_bar_frame, text='Hour:')
 		order_hour_label.grid(row=2, column=0, padx=20, sticky='e')
-		self.order_hour_combobox = ttk.Combobox(data_bar_frame, width=17)
+		self.order_hour_combobox = ttk.Combobox(data_bar_frame)
 		self.order_hour_combobox.grid(row=2, column=1, padx=20, pady=16, sticky='e')
 		self.order_hour_combobox.config(state='readonly')
 
